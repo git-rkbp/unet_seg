@@ -170,7 +170,7 @@ MODEL_PATH = './save'
 LOAD_MODEL = False 
 BATCH_SIZE = 8
 LEARNING_RATE = 0.0005
-EPOCHS = 20
+EPOCHS = 1
 ALPHA = 1200
 SIGMA = 30
 
@@ -246,6 +246,8 @@ if LOAD_MODEL == True:
     print("Model successfully loaded!") 
 
 
+
+last_loss = 100
 #Training the model for every epoch. 
 for e in range(epoch, EPOCHS):
 
@@ -271,16 +273,19 @@ for e in range(epoch, EPOCHS):
 
     scheduler.step()
 
-    if e ==18:
-        # Save checkpoint for each epoch with a unique file name
-        epoch_model_path = os.path.join(MODEL_DIR, f'model_checkpoint_epoch_{e}.pth')
-        torch.save({
-            'model_state_dict': unet.state_dict(),
-            'optim_state_dict': optimizer.state_dict(),
-            'epoch': e,
-            'loss_values': LOSS_VALS
-        }, epoch_model_path)
-        print(f"Epoch {e} completed and model successfully saved at {epoch_model_path}!")
+    if e >20:
+        if validation_loss < last_loss:
+            # Save checkpoint for each epoch with a unique file name
+            epoch_model_path = os.path.join(MODEL_DIR, f'model_checkpoint_epoch_0.pth')
+            torch.save({
+                'model_state_dict': unet.state_dict(),
+                'optim_state_dict': optimizer.state_dict(),
+                'epoch': e,
+                'loss_values': LOSS_VALS
+            }, epoch_model_path)
+
+            last_loss = validation_loss   
+            print(f"Epoch {e} completed and model successfully saved at {epoch_model_path}!")
 
     
    
